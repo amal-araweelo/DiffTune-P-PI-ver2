@@ -31,26 +31,24 @@ function [ud, v] = controller(X, Xref, k_vec, theta_r_dot, theta_r_2dot, v, para
     % States
     omega_m = X(1);
     omega_l = X(2);
-    theta_m = X(3);
     theta_l = X(4);
     theta_r = Xref;
 
     % Define the error
-    e_pos = theta_r - theta_l;
+    e_theta = theta_r - theta_l;
 
     % P-controller (modified to use error e)
-    omega_r = k_pos * e_pos + N * theta_r_dot;
+    omega_r = k_pos * e_theta + N * theta_r_dot;
     omega_r_dot = k_pos * (theta_r_dot - omega_l) + N * theta_r_2dot;
         
     % Define velocity error
-    s = omega_r - omega_m;
-    v_dot = k_i * s;
+    e_omega = omega_r - omega_m;
+    v_dot =  e_omega;
     v = v + v_dot * dt;
-
 
     %omega_r_integ = omega_r_integ + omega_r * dt;
    
-    % PI-controller
-    ud = v + s * k_vel + omega_r_dot * J_m;
+    % PI-controller (integral error)
+    ud = k_i * v + e_omega * k_vel + omega_r_dot * J_m;
 
 end
